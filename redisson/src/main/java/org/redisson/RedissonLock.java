@@ -172,12 +172,15 @@ public class RedissonLock extends RedissonExpirable implements RLock {
 
     private void lock(long leaseTime, TimeUnit unit, boolean interruptibly) throws InterruptedException {
         long threadId = Thread.currentThread().getId();
+        // 尝试获取锁,锁获取成功则ttl为null;获取失败则返回锁的剩余过期时间
         Long ttl = tryAcquire(-1, leaseTime, unit, threadId);
         // lock acquired
         if (ttl == null) {
             return;
         }
 
+        // 锁被其他线程占用而索取失败,使用线程通知而非自旋的方式等待锁
+        // 使用redis的发布订阅pub/sub功能来等待锁的释放通知
         RFuture<RedissonLockEntry> future = subscribe(threadId);
         if (interruptibly) {
             commandExecutor.syncSubscriptionInterrupted(future);
@@ -205,6 +208,7 @@ public class RedissonLock extends RedissonExpirable implements RLock {
                     }
                 } else {
                     if (interruptibly) {
+                        // 收到解锁消息, 则唤醒阻塞在下面的entry.getLatch().acquire();
                         future.getNow().getLatch().acquire();
                     } else {
                         future.getNow().getLatch().acquireUninterruptibly();
@@ -212,6 +216,7 @@ public class RedissonLock extends RedissonExpirable implements RLock {
                 }
             }
         } finally {
+            //加锁成功或异常,解除订阅
             unsubscribe(future, threadId);
         }
 //        get(lockAsync(leaseTime, unit));

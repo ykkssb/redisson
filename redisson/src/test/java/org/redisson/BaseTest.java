@@ -13,7 +13,7 @@ public abstract class BaseTest {
     protected RedissonClient redisson;
     protected static RedissonClient defaultRedisson;
 
-    @BeforeClass
+//    @BeforeClass
     public static void beforeClass() throws IOException, InterruptedException {
         if (!RedissonRuntimeEnvironment.isTravis) {
             RedisRunner.startDefaultRedisServerInstance();
@@ -27,7 +27,7 @@ public abstract class BaseTest {
         }
     }
 
-    @Before
+//    @Before
     public void before() throws IOException, InterruptedException {
         if (RedissonRuntimeEnvironment.isTravis) {
             RedisRunner.startDefaultRedisServerInstance();
@@ -60,7 +60,7 @@ public abstract class BaseTest {
 //        config.useSentinelServers().setMasterName("mymaster").addSentinelAddress("127.0.0.1:26379", "127.0.0.1:26389");
 //        config.useClusterServers().addNodeAddress("127.0.0.1:7004", "127.0.0.1:7001", "127.0.0.1:7000");
         config.useSingleServer()
-                .setAddress(RedisRunner.getDefaultRedisServerBindAddressAndPort());
+                .setAddress("redis://127.0.0.1:6379");
 //        .setPassword("mypass1");
 //        config.useMasterSlaveConnection()
 //        .setMasterAddress("127.0.0.1:6379")

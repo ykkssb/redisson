@@ -122,7 +122,7 @@ public class RedissonTest {
         localRedisson.shutdown();
     }
     
-    @BeforeClass
+//    @BeforeClass
     public static void beforeClass() throws IOException, InterruptedException {
         if (!RedissonRuntimeEnvironment.isTravis) {
             RedisRunner.startDefaultRedisServerInstance();
@@ -130,7 +130,7 @@ public class RedissonTest {
         }
     }
 
-    @AfterClass
+//    @AfterClass
     public static void afterClass() throws IOException, InterruptedException {
         if (!RedissonRuntimeEnvironment.isTravis) {
             RedisRunner.shutDownDefaultRedisServerInstance();
@@ -138,7 +138,7 @@ public class RedissonTest {
         }
     }
 
-    @Before
+//    @Before
     public void before() throws IOException, InterruptedException {
         if (RedissonRuntimeEnvironment.isTravis) {
             RedisRunner.startDefaultRedisServerInstance();
@@ -151,7 +151,7 @@ public class RedissonTest {
         }
     }
 
-    @After
+//    @After
     public void after() throws InterruptedException {
         if (RedissonRuntimeEnvironment.isTravis) {
             redisson.shutdown();
