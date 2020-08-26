@@ -295,7 +295,8 @@ public class RedissonLock extends RedissonExpirable implements RLock {
                         log.error("Can't update lock " + getName() + " expiration", e);
                         return;
                     }
-                    
+
+                    // 如果锁续期成功,则10秒钟后再次续期
                     if (res) {
                         // reschedule itself
                         renewExpiration();
