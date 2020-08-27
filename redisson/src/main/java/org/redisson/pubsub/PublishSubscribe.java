@@ -48,6 +48,7 @@ abstract class PublishSubscribe<E extends PubSubEntry<E>> {
 
     public void unsubscribe(E entry, String entryName, String channelName) {
         AsyncSemaphore semaphore = service.getSemaphore(new ChannelName(channelName));
+        // 尝试运行线程，并发太高超过50，移入队列等待执行
         semaphore.acquire(new Runnable() {
             @Override
             public void run() {
@@ -68,7 +69,9 @@ abstract class PublishSubscribe<E extends PubSubEntry<E>> {
 
     public RFuture<E> subscribe(String entryName, String channelName) {
         AtomicReference<Runnable> listenerHolder = new AtomicReference<Runnable>();
+        // 取模计算信号量下标
         AsyncSemaphore semaphore = service.getSemaphore(new ChannelName(channelName));
+        // 设置移除运行线程
         RPromise<E> newPromise = new RedissonPromise<E>() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
@@ -80,14 +83,18 @@ abstract class PublishSubscribe<E extends PubSubEntry<E>> {
 
             @Override
             public void run() {
+                // E:RedissonLockEntry数据结构
                 E entry = entries.get(entryName);
                 if (entry != null) {
+                    // 计数器++
                     entry.acquire();
+                    // 当前线程执行完成，通知剩余队列中执行
                     semaphore.release();
                     entry.getPromise().onComplete(new TransferListener<E>(newPromise));
                     return;
                 }
-                
+
+                // LockPubSub创建RedissonLockEntry
                 E value = createEntry(newPromise);
                 value.acquire();
                 
@@ -103,6 +110,8 @@ abstract class PublishSubscribe<E extends PubSubEntry<E>> {
                 service.subscribe(LongCodec.INSTANCE, channelName, semaphore, listener);
             }
         };
+
+        // 尝试运行线程，并发太高超过50，移入队列等待执行
         semaphore.acquire(listener);
         listenerHolder.set(listener);
         

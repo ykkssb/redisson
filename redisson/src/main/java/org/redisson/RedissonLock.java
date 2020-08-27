@@ -199,7 +199,7 @@ public class RedissonLock extends RedissonExpirable implements RLock {
                 // waiting for message
                 if (ttl >= 0) {
                     try {
-                        future.getNow().getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
+                            future.getNow().getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
                         if (interruptibly) {
                             throw e;
