@@ -32,7 +32,7 @@ import org.redisson.connection.MasterSlaveEntry;
 import org.redisson.liveobject.core.RedissonObjectBuilder;
 
 /**
- *
+ * redisson读写操作异步执行服务
  * @author Nikita Koksharov
  *
  */

@@ -53,6 +53,7 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class RedissonObject implements RObject {
 
+    //redisson读写操作异步执行服务
     protected final CommandAsyncExecutor commandExecutor;
     protected String name;
     protected final Codec codec;
